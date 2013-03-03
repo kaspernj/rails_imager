@@ -4,17 +4,19 @@ require "tmpdir"
 
 class RailsImager
   IMG_FROMpARAMS_ALLOWED_ARGS = [:image, :params]
-  CACHENAME_FROMpARAMS_ALLOWED_ARGS = [:params]
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color]
   INITIALIZE_ALLOWED_ARGS = [:cache_dir]
   
+  #This is the default cache which is plased in the temp-directory, so it will be cleared on every restart. It should always exist.
   DEFAULT_CACHE_DIR = "#{Dir.tmpdir}/rails-imager-cache"
   Dir.mkdir(DEFAULT_CACHE_DIR) if !Dir.exists?(DEFAULT_CACHE_DIR)
   
+  #Default arguments unless something else is given in constructor.
   DEFAULT_ARGS = {
     :cache_dir => DEFAULT_CACHE_DIR
   }
   
+  #Initializes the RailsImager.
   def initialize(args = {})
     args.each do |key, val|
       raise "Invalid argument: '#{key}'." if !INITIALIZE_ALLOWED_ARGS.include?(key)
@@ -23,6 +25,7 @@ class RailsImager
     @args = DEFAULT_ARGS.merge(args)
   end
   
+  #Create a new image-object based on the given image-object and the parameters.
   def img_from_params(args)
     args.each do |key, val|
       raise "Invalid argument: '#{key}'." if !IMG_FROMpARAMS_ALLOWED_ARGS.include?(key)
@@ -98,20 +101,87 @@ class RailsImager
     return img
   end
   
-  def cachename_fromparams(args)
+  CACHENAME_FROM_PARAMS_ALLOWED_ARGS = [:params, :image, :fpath]
+  #Returns the path to a cached object based on the given filepath, image and request-parameters.
+  def cachename_from_params(args)
     args.each do |key, val|
-      raise "Invalid argument: '#{key}'." if !CACHENAME_FROMpARAMS_ALLOWED_ARGS.include?(key)
+      raise "Invalid argument: '#{key}'." if !CACHENAME_FROM_PARAMS_ALLOWED_ARGS.include?(key)
     end
     
     params = args[:params]
     raise "No params was given." if !params
     
-    name = ""
+    if args[:image] and !args[:image].filename.to_s.strip.empty?
+      name = Knj::Strings.sanitize_filename(args[:image].filename)
+    elsif args[:fpath]
+      name = Knj::Strings.sanitize_filename(args[:fpath])
+    else
+      raise "No image or fpath was given."
+    end
+    
+    name << "__ARGS__"
+    
     PARAMS_ARGS.each do |val|
-      name += "__" if !name.empty?
-      name += "#{val}_#{params[val]}"
+      name += "_" if !name.empty?
+      name += "#{val}-#{params[val]}"
     end
     
     return name
+  end
+  
+  FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :params]
+  #Checks if a cache-file is created for the given filepath or image. If not then it will be created. If the cache-object is too old, then it will updated. Then returns the path to the cache-object in the end.
+  def force_cache_from_params(args)
+    args.each do |key, val|
+      raise "Invalid argument: '#{key}'." if !FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS.include?(key)
+    end
+    
+    img = nil
+    
+    if args[:fpath] and !args[:fpath].to_s.strip.empty?
+      fpath = args[:fpath]
+    elsif args[:image] and !args[:image].filename.to_s.strip.empty?
+      fpath = args[:image].filename
+      img = args[:image]
+    else
+      raise "No image or filename was given."
+    end
+    
+    params = args[:params]
+    raise "No params was given." if !params
+    
+    cachename = self.cachename_from_params(:fpath => fpath, :params => args[:params])
+    cachepath = "#{@args[:cache_dir]}/#{cachename}"
+    
+    if !File.exists?(cachepath) or File.mtime(cachepath) < File.mtime(fpath)
+      should_generate = true
+    else
+      should_generate = false
+    end
+    
+    if should_generate
+      img = Magick::Image.read(fpath) if !img
+      img = self.img_from_params(:image => img, :params => params)
+      img.write(cachepath)
+    end
+    
+    return cachepath
+  end
+  
+  #Yields every cache-file to the block. If the block returns true, then the cache-file will be deleted. If no block is given all the cache will be deleted.
+  def clear_cache(&blk)
+    Dir.foreach(@args[:cache_dir]) do |file|
+      next if file == "." or file == ".."
+      fn = "#{@args[:cache_dir]}/#{file}"
+      next if !File.file?(fn)
+      
+      if blk == nil
+        res = true
+      else
+        res = yield(fn)
+      end
+      
+      File.unlink(fn) if res == true
+    end
   end
 end

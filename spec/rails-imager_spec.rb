@@ -65,7 +65,28 @@ describe "RailsImager" do
     newimg.columns.should eql(203)
   end
   
-  it "should be able to generate logical cache names" do
+  it "should be able to generate valid cache names" do
+    cachename = RIMG.cachename_from_params(:fpath => '1\\2 3', :params => {:smartsize => 400})
+    cachename.should eql("1_2_3__ARGS___width-_height-_smartsize-400_maxwidth-_maxheight-_rounded_corners-_border-_border_color-")
+  end
+  
+  it "should be able to generate cache" do
+    res = RIMG.force_cache_from_params(:image => IMG, :params => {:smartsize => 350})
+    expected = "#{CACHE_DIR}/#{Knj::Strings.sanitize_filename(IMG.filename)}__ARGS___width-_height-_smartsize-350_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
+    res.should eql(expected)
+  end
+  
+  it "should be able to clear the cache" do
+    RIMG.clear_cache do |fpath|
+      true
+    end
     
+    cache_size = 0
+    Dir.foreach(CACHE_DIR) do |file|
+      next if file == "." or file == ".."
+      cache_size += 1
+    end
+    
+    cache_size.should eql(0)
   end
 end
