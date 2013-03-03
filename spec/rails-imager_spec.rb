@@ -12,19 +12,19 @@ describe "RailsImager" do
   RIMG = RailsImager.new(:cache_dir => CACHE_DIR)
   
   it "should do smartsizing" do
-    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => 640})
+    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => "640"})
     newimg.columns.should eql(640)
     newimg.rows.should eql(629)
   end
   
   it "should do exact sizes" do
-    newimg = RIMG.img_from_params(:image => IMG, :params => {:width => 640, :height => 480})
+    newimg = RIMG.img_from_params(:image => IMG, :params => {:width => "640", :height => "480"})
     newimg.columns.should eql(640)
     newimg.rows.should eql(480)
   end
   
   it "should do rounded corners" do
-    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => 640, :rounded_corners => 15, :border => 1, :border_color => "black"})
+    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => "640", :rounded_corners => "15", :border => "1", :border_color => "black"})
     
     newimg.columns.should eql(640)
     newimg.rows.should eql(629)

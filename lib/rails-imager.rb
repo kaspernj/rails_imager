@@ -88,7 +88,7 @@ class RailsImager
       args = {:img => img, :radius => params[:rounded_corners].to_i}
       
       if params[:border] and params[:border_color]
-        args[:border] = params[:border]
+        args[:border] = params[:border].to_i
         args[:border_color] = params[:border_color]
       end
       
