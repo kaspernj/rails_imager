@@ -3,9 +3,7 @@ require "knjrbfw"
 require "tmpdir"
 
 class RailsImager
-  IMG_FROMpARAMS_ALLOWED_ARGS = [:image, :params]
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color]
-  INITIALIZE_ALLOWED_ARGS = [:cache_dir]
   
   #This is the default cache which is plased in the temp-directory, so it will be cleared on every restart. It should always exist.
   DEFAULT_CACHE_DIR = "#{Dir.tmpdir}/rails-imager-cache"
@@ -16,6 +14,7 @@ class RailsImager
     :cache_dir => DEFAULT_CACHE_DIR
   }
   
+  INITIALIZE_ALLOWED_ARGS = [:cache_dir]
   #Initializes the RailsImager.
   def initialize(args = {})
     args.each do |key, val|
@@ -25,10 +24,11 @@ class RailsImager
     @args = DEFAULT_ARGS.merge(args)
   end
   
+  IMG_FROM_PARAMS_ALLOWED_ARGS = [:image, :params]
   #Create a new image-object based on the given image-object and the parameters.
   def img_from_params(args)
     args.each do |key, val|
-      raise "Invalid argument: '#{key}'." if !IMG_FROMpARAMS_ALLOWED_ARGS.include?(key)
+      raise "Invalid argument: '#{key}'." if !IMG_FROM_PARAMS_ALLOWED_ARGS.include?(key)
     end
     
     #Set up vars.
@@ -156,6 +156,7 @@ class RailsImager
     cachename = self.cachename_from_params(:fpath => fpath, :params => params)
     cachepath = "#{@args[:cache_dir]}/#{cachename}"
     not_modified = false
+    headers = request.headers
     
     if !File.exists?(cachepath) or File.mtime(cachepath) < File.mtime(fpath)
       should_generate = true
@@ -168,7 +169,13 @@ class RailsImager
       img = self.img_from_params(:image => img, :params => params)
       img.write(cachepath)
     else
-      if_mod_since_time = request.if_modified_since
+      if_mod_since_time = nil
+      if headers["HTTP_IF_MODIFIED_SINCE"]
+        if_mod_since_time = Datet.in(headers["HTTP_IF_MODIFIED_SINCE"]).time
+      else
+        if_mod_since_time = request.if_modified_since
+      end
+      
       not_modified = true if if_mod_since_time and if_mod_since_time.utc.to_s == mod_time.utc.to_s
     end
     
@@ -178,6 +185,35 @@ class RailsImager
       :not_modified => not_modified,
       :mod_time => mod_time
     }
+  end
+  
+  HANDLE_ALLOWED_ARGS = [:fpath, :image, :controller]
+  #Automatically handles the image with generation, cache control and more.
+  def handle(args)
+    args.each do |key, val|
+      raise "Invalid argument: '#{key}'." if !HANDLE_ALLOWED_ARGS.include?(key)
+    end
+    
+    controller = args[:controller]
+    raise "No controller was given." if !controller
+    request = controller.request
+    
+    if args[:image]
+      fpath = args[:image].filename
+    elsif args[:fpath]
+      fpath = args[:fpath]
+    end
+    
+    raise "No filepath was given." if !fpath
+    res = self.force_cache_from_request(fpath: fpath, request: request)
+    
+    if res[:not_modified]
+      controller.render :nothing => true, :status => "304 Not Modified"
+    else
+      controller.expires_in 1.weeks, public: true
+      controller.response.header["Last-Modified"] = res[:mod_time].to_s
+      controller.send_file res[:cachepath], type: "image/png", disposition: "inline", filename: "picture.png"
+    end
   end
   
   #Yields every cache-file to the block. If the block returns true, then the cache-file will be deleted. If no block is given all the cache will be deleted.

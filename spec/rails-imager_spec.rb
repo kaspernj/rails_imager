@@ -16,7 +16,9 @@ describe "RailsImager" do
   MOD_TIME = File.mtime(TEST_FILE)
   REQUEST_350 = Knj::Hash_methods.new({
     :request_parameters => {:smartsize => 350},
-    :if_modified_since => MOD_TIME
+    :headers => {
+      "HTTP_IF_MODIFIED_SINCE" => MOD_TIME
+    }
   })
   
   it "should do smartsizing" do
@@ -111,7 +113,7 @@ describe "RailsImager" do
     
     #Generate again - expected modified.
     day_ago = Datet.new.add_days(-1).time
-    request_day_ago = Knj::Hash_methods.new(REQUEST_350.merge({:if_modified_since => day_ago}))
+    request_day_ago = Knj::Hash_methods.new(REQUEST_350.merge({:headers => {"HTTP_IF_MODIFIED_SINCE" => day_ago}}))
     res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => request_day_ago)
     res_from_img[:not_modified].should eql(false)
     res_from_img[:generated].should eql(false)
