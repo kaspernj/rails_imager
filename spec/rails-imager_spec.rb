@@ -14,8 +14,8 @@ describe "RailsImager" do
   RIMG = RailsImager.new(:cache_dir => CACHE_DIR)
   
   MOD_TIME = File.mtime(TEST_FILE)
+  PARAMS_350 = {:smartsize => 350}
   REQUEST_350 = Knj::Hash_methods.new({
-    :request_parameters => {:smartsize => 350},
     :headers => {
       "HTTP_IF_MODIFIED_SINCE" => MOD_TIME
     }
@@ -81,9 +81,9 @@ describe "RailsImager" do
   end
   
   it "should be able to generate cache" do
-    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350, :params => PARAMS_350)
     RIMG.clear_cache
-    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350)
+    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350, :params => PARAMS_350)
     
     res_from_img[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
     res_from_fpath[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
@@ -91,8 +91,8 @@ describe "RailsImager" do
     res_from_img[:generated].should eql(true)
     res_from_fpath[:generated].should eql(true)
     
-    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
-    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350, :params => PARAMS_350)
+    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350, :params => PARAMS_350)
     
     res_from_img[:generated].should eql(false)
     res_from_fpath[:generated].should eql(false)
@@ -102,19 +102,19 @@ describe "RailsImager" do
   
   it "should send not modified" do
     #Generate fresh cache.
-    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350, :params => PARAMS_350)
     res_from_img[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
     res_from_img[:generated].should eql(true)
     
     #Generate again - expect not-modified.
-    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350, :params => PARAMS_350)
     res_from_img[:generated].should eql(false)
     res_from_img[:not_modified].should eql(true)
     
     #Generate again - expected modified.
     day_ago = Datet.new.add_days(-1).time
     request_day_ago = Knj::Hash_methods.new(REQUEST_350.merge({:headers => {"HTTP_IF_MODIFIED_SINCE" => day_ago}}))
-    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => request_day_ago)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => request_day_ago, :params => PARAMS_350)
     res_from_img[:not_modified].should eql(false)
     res_from_img[:generated].should eql(false)
     

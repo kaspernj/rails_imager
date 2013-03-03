@@ -129,7 +129,7 @@ class RailsImager
     return name
   end
   
-  FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :request]
+  FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :request, :params]
   #Checks if a cache-file is created for the given filepath or image. If not then it will be created. If the cache-object is too old, then it will updated. Then returns the path to the cache-object in the end.
   def force_cache_from_request(args)
     args.each do |key, val|
@@ -149,7 +149,7 @@ class RailsImager
     
     request = args[:request]
     raise "Invalid request: '#{request.class.name}'." if !request
-    params = request.request_parameters
+    params = args[:params]
     raise "No parameters on that request: '#{params.class.name}'." if !params
     
     mod_time = File.mtime(fpath)
@@ -187,7 +187,7 @@ class RailsImager
     }
   end
   
-  HANDLE_ALLOWED_ARGS = [:fpath, :image, :controller]
+  HANDLE_ALLOWED_ARGS = [:fpath, :image, :controller, :params]
   #Automatically handles the image with generation, cache control and more.
   def handle(args)
     args.each do |key, val|
@@ -197,6 +197,8 @@ class RailsImager
     controller = args[:controller]
     raise "No controller was given." if !controller
     request = controller.request
+    params = args[:params]
+    raise "No params was given." if !params
     
     if args[:image]
       fpath = args[:image].filename
@@ -205,7 +207,7 @@ class RailsImager
     end
     
     raise "No filepath was given." if !fpath
-    res = self.force_cache_from_request(fpath: fpath, request: request)
+    res = self.force_cache_from_request(fpath: fpath, request: request, params: params)
     
     if res[:not_modified]
       controller.render :nothing => true, :status => "304 Not Modified"
