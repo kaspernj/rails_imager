@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "rails-imager"
   gem.homepage = "http://github.com/kaspernj/rails-imager"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A small library to handle re-sizing, transparent edges and caching of images in Rails.}
+  gem.description = %Q{A small library to handle re-sizing, transparent edges and caching of images in Rails.}
   gem.email = "k@spernj.org"
   gem.authors = ["kaspernj"]
   # dependencies defined in Gemfile
