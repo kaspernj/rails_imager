@@ -3,8 +3,8 @@ require "knjrbfw"
 require "tmpdir"
 
 class RailsImager
-  IMG_FROM_PARAMS_ALLOWED_ARGS = [:image, :params]
-  CACHENAME_FROM_PARAMS_ALLOWED_ARGS = [:params]
+  IMG_FROMpARAMS_ALLOWED_ARGS = [:image, :params]
+  CACHENAME_FROMpARAMS_ALLOWED_ARGS = [:params]
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color]
   INITIALIZE_ALLOWED_ARGS = [:cache_dir]
   
@@ -25,7 +25,7 @@ class RailsImager
   
   def img_from_params(args)
     args.each do |key, val|
-      raise "Invalid argument: '#{key}'." if !IMG_FROM_PARAMS_ALLOWED_ARGS.include?(key)
+      raise "Invalid argument: '#{key}'." if !IMG_FROMpARAMS_ALLOWED_ARGS.include?(key)
     end
     
     #Set up vars.
@@ -87,20 +87,26 @@ class RailsImager
       img = img.clone
       args = {:img => img, :radius => params[:rounded_corners].to_i}
       
-      if params[:border] and _params[:border_color]
+      if params[:border] and params[:border_color]
         args[:border] = params[:border]
         args[:border_color] = params[:border_color]
       end
       
-      Knj::Image.rounded_corners(args)
+      begin
+        Knj::Image.rounded_corners(args)
+      rescue Exception => e
+        puts e.inspect
+        puts e.backtrace
+        raise e
+      end
     end
     
     return img
   end
   
-  def cachename_from_params(args)
+  def cachename_fromparams(args)
     args.each do |key, val|
-      raise "Invalid argument: '#{key}'." if !CACHENAME_FROM_PARAMS_ALLOWED_ARGS.include?(key)
+      raise "Invalid argument: '#{key}'." if !CACHENAME_FROMpARAMS_ALLOWED_ARGS.include?(key)
     end
     
     params = args[:params]

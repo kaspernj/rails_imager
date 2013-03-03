@@ -24,19 +24,26 @@ describe "RailsImager" do
   end
   
   it "should do rounded corners" do
-    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => 640, :rounded_corners => 15})
+    newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => 640, :rounded_corners => 15, :border => 1, :border_color => "black"})
     
     newimg.columns.should eql(640)
     newimg.rows.should eql(629)
     
     #Test that corner pixels are transparent.
-    2.times do |time|
+    4.times do |time|
       pixel = newimg.pixel_color(time, time)
       pixel.opacity.should eql(65535)
       
       pixel_orig = IMG.pixel_color(time, time)
       pixel_orig.opacity.should eql(0)
     end
+    
+    #Test that it got a black border.
+    pixel = newimg.pixel_color(2, 5)
+    pixel.red.should eql(0)
+    pixel.green.should eql(0)
+    pixel.blue.should eql(0)
+    pixel.opacity.should eql(0)
     
     #Test that middle pixels are not transparent.
     100.upto(200) do |time|
@@ -56,5 +63,9 @@ describe "RailsImager" do
     newimg = RIMG.img_from_params(:image => IMG, :params => {:maxheight => 200})
     newimg.rows.should eql(200)
     newimg.columns.should eql(203)
+  end
+  
+  it "should be able to generate logical cache names" do
+    
   end
 end
