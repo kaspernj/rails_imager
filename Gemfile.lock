@@ -40,6 +40,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
+  datet
   jeweler
   knjrbfw
   rdoc (~> 3.12)

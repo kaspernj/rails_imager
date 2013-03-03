@@ -129,9 +129,9 @@ class RailsImager
     return name
   end
   
-  FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :params]
+  FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :request]
   #Checks if a cache-file is created for the given filepath or image. If not then it will be created. If the cache-object is too old, then it will updated. Then returns the path to the cache-object in the end.
-  def force_cache_from_params(args)
+  def force_cache_from_request(args)
     args.each do |key, val|
       raise "Invalid argument: '#{key}'." if !FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS.include?(key)
     end
@@ -147,11 +147,15 @@ class RailsImager
       raise "No image or filename was given."
     end
     
-    params = args[:params]
-    raise "No params was given." if !params
+    request = args[:request]
+    raise "Invalid request: '#{request.class.name}'." if !request
+    params = request.request_parameters
+    raise "No parameters on that request: '#{params.class.name}'." if !params
     
-    cachename = self.cachename_from_params(:fpath => fpath, :params => args[:params])
+    mod_time = File.mtime(fpath)
+    cachename = self.cachename_from_params(:fpath => fpath, :params => params)
     cachepath = "#{@args[:cache_dir]}/#{cachename}"
+    not_modified = false
     
     if !File.exists?(cachepath) or File.mtime(cachepath) < File.mtime(fpath)
       should_generate = true
@@ -160,12 +164,20 @@ class RailsImager
     end
     
     if should_generate
-      img = Magick::Image.read(fpath) if !img
+      img = Magick::Image.read(fpath).first if !img
       img = self.img_from_params(:image => img, :params => params)
       img.write(cachepath)
+    else
+      if_mod_since_time = request.if_modified_since
+      not_modified = true if if_mod_since_time and if_mod_since_time.utc.to_s == mod_time.utc.to_s
     end
     
-    return cachepath
+    return {
+      :cachepath => cachepath,
+      :generated => should_generate,
+      :not_modified => not_modified,
+      :mod_time => mod_time
+    }
   end
   
   #Yields every cache-file to the block. If the block returns true, then the cache-file will be deleted. If no block is given all the cache will be deleted.

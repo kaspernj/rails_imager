@@ -2,14 +2,22 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 require "tmpdir"
 require "fileutils"
+require "datet"
 
 describe "RailsImager" do
   TEST_FILE = File.realpath("#{File.dirname(__FILE__)}/test.png")
   IMG = Magick::Image.read(TEST_FILE).first
   CACHE_DIR = "#{Dir.tmpdir}/rails-imager-test-cache"
+  CACHE_PATH_SMARTSIZE_350 = "#{CACHE_DIR}/#{Knj::Strings.sanitize_filename(IMG.filename)}__ARGS___width-_height-_smartsize-350_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
   FileUtils.rm_r(CACHE_DIR) if Dir.exists?(CACHE_DIR)
   Dir.mkdir(CACHE_DIR)
   RIMG = RailsImager.new(:cache_dir => CACHE_DIR)
+  
+  MOD_TIME = File.mtime(TEST_FILE)
+  REQUEST_350 = Knj::Hash_methods.new({
+    :request_parameters => {:smartsize => 350},
+    :if_modified_since => MOD_TIME
+  })
   
   it "should do smartsizing" do
     newimg = RIMG.img_from_params(:image => IMG, :params => {:smartsize => "640"})
@@ -71,9 +79,45 @@ describe "RailsImager" do
   end
   
   it "should be able to generate cache" do
-    res = RIMG.force_cache_from_params(:image => IMG, :params => {:smartsize => 350})
-    expected = "#{CACHE_DIR}/#{Knj::Strings.sanitize_filename(IMG.filename)}__ARGS___width-_height-_smartsize-350_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
-    res.should eql(expected)
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    RIMG.clear_cache
+    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350)
+    
+    res_from_img[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
+    res_from_fpath[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
+    
+    res_from_img[:generated].should eql(true)
+    res_from_fpath[:generated].should eql(true)
+    
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_fpath = RIMG.force_cache_from_request(:fpath => TEST_FILE, :request => REQUEST_350)
+    
+    res_from_img[:generated].should eql(false)
+    res_from_fpath[:generated].should eql(false)
+    
+    RIMG.clear_cache
+  end
+  
+  it "should send not modified" do
+    #Generate fresh cache.
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_img[:cachepath].should eql(CACHE_PATH_SMARTSIZE_350)
+    res_from_img[:generated].should eql(true)
+    
+    #Generate again - expect not-modified.
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => REQUEST_350)
+    res_from_img[:generated].should eql(false)
+    res_from_img[:not_modified].should eql(true)
+    
+    #Generate again - expected modified.
+    day_ago = Datet.new.add_days(-1).time
+    request_day_ago = Knj::Hash_methods.new(REQUEST_350.merge({:if_modified_since => day_ago}))
+    res_from_img = RIMG.force_cache_from_request(:image => IMG, :request => request_day_ago)
+    res_from_img[:not_modified].should eql(false)
+    res_from_img[:generated].should eql(false)
+    
+    #Clear cache to reset.
+    RIMG.clear_cache
   end
   
   it "should be able to clear the cache" do
