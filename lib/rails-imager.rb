@@ -92,13 +92,7 @@ class RailsImager
         args[:border_color] = params[:border_color]
       end
       
-      begin
-        Knj::Image.rounded_corners(args)
-      rescue Exception => e
-        puts e.inspect
-        puts e.backtrace
-        raise e
-      end
+      Knj::Image.rounded_corners(args)
     end
     
     return img
