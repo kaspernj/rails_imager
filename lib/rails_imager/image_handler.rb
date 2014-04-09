@@ -115,7 +115,7 @@ class RailsImager::ImageHandler
     params = args[:params]
     raise "No params was given." unless params
     
-    if args[:image] and !args[:image].filename.to_s.strip.empty?
+    if args[:image] && !args[:image].filename.to_s.strip.empty?
       name = Knj::Strings.sanitize_filename(args[:image].filename)
     elsif args[:fpath]
       name = Knj::Strings.sanitize_filename(args[:fpath])
@@ -126,7 +126,7 @@ class RailsImager::ImageHandler
     name << "__ARGS__"
     
     PARAMS_ARGS.each do |val|
-      name += "_" if !name.empty?
+      name += "_" unless name.empty?
       name += "#{val}-#{params[val]}"
     end
     
@@ -142,9 +142,9 @@ class RailsImager::ImageHandler
     
     img = nil
     
-    if args[:fpath] and !args[:fpath].to_s.strip.empty?
+    if args[:fpath] && !args[:fpath].to_s.strip.empty?
       fpath = args[:fpath]
-    elsif args[:image] and !args[:image].filename.to_s.strip.empty?
+    elsif args[:image] && !args[:image].filename.to_s.strip.empty?
       fpath = args[:image].filename
       img = args[:image]
     else
@@ -169,7 +169,7 @@ class RailsImager::ImageHandler
     end
     
     if should_generate
-      img = Magick::Image.read(fpath).first if !img
+      img = Magick::Image.read(fpath).first unless img
       img = self.img_from_params(:image => img, :params => params)
       img.write(cachepath)
     else

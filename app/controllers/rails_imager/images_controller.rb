@@ -6,12 +6,20 @@ class RailsImager::ImagesController < ApplicationController
     
     image_params = params[:image] || {}
     
+    # Check for invalid parameters.
+    image_params.each do |key, val|
+      raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImageHandler::PARAMS_ARGS.map{ |param| param.to_s }.include?(key)
+    end
+    
     image_path = "#{Rails.public_path}/#{params[:id]}"
     image_path = File.realpath(image_path)
     validate_path(image_path)
     
     image = Magick::Image.read(image_path).first
     image = rimger.img_from_params(:image => image, :params => image_params)
+    
+    response.headers["Expires"] = 2.hours.from_now.httpdate
+    response.headers["Last-Modified"] = File.mtime(image_path).httpdate
     
     send_data image.to_blob, :type => "image/png", :disposition => "inline"
   end
