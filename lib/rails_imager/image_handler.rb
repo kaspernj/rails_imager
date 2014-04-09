@@ -162,7 +162,7 @@ class RailsImager::ImageHandler
     not_modified = false
     headers = request.headers
     
-    if !File.exists?(cachepath) or File.mtime(cachepath) < File.mtime(fpath)
+    if !File.exists?(cachepath) || File.mtime(cachepath) < File.mtime(fpath)
       should_generate = true
     else
       should_generate = false
@@ -180,7 +180,7 @@ class RailsImager::ImageHandler
         if_mod_since_time = request.if_modified_since
       end
       
-      not_modified = true if if_mod_since_time and if_mod_since_time.utc.to_s == mod_time.utc.to_s
+      not_modified = true if if_mod_since_time && if_mod_since_time.utc.to_s == mod_time.utc.to_s
     end
     
     return {
@@ -225,7 +225,7 @@ class RailsImager::ImageHandler
   #Yields every cache-file to the block. If the block returns true, then the cache-file will be deleted. If no block is given all the cache will be deleted.
   def clear_cache(&blk)
     Dir.foreach(@args[:cache_dir]) do |file|
-      next if file == "." or file == ".."
+      next if file == "." || file == ".."
       fn = "#{@args[:cache_dir]}/#{file}"
       next if !File.file?(fn)
       
