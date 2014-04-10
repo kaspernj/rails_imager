@@ -109,6 +109,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rails>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<rails>, [">= 0"])
     else
       s.add_dependency(%q<rails_imager>, [">= 0"])
       s.add_dependency(%q<knjrbfw>, [">= 0"])
@@ -117,6 +119,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<string-cases>, [">= 0"])
       s.add_dependency(%q<sqlite3>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<rails>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rails>, [">= 0"])
     end
@@ -128,6 +132,8 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<string-cases>, [">= 0"])
     s.add_dependency(%q<sqlite3>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<rails>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rails>, [">= 0"])
   end
