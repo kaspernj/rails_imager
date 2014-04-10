@@ -32,19 +32,5 @@ Rake::TestTask.new(:test) do |t|
 end
 
 
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "rails_imager"
-  gem.homepage = "http://github.com/kaspernj/rails_imager"
-  gem.license = "MIT"
-  gem.summary = %Q{A small library to handle re-sizing, transparent edges and caching of images in Rails.}
-  gem.description = %Q{A small library to handle re-sizing, transparent edges and caching of images in Rails.}
-  gem.email = "k@spernj.org"
-  gem.authors = ["kaspernj"]
-  # dependencies defined in Gemfile
-end
-Jeweler::RubygemsDotOrgTasks.new
-
 
 task default: :test
