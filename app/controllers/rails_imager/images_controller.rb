@@ -3,7 +3,6 @@ require_dependency "rails_imager/application_controller"
 class RailsImager::ImagesController < ApplicationController
   def show
     rimger = RailsImager::ImageHandler.new
-    
     image_params = params[:image] || {}
     
     # Check for invalid parameters.
@@ -15,13 +14,11 @@ class RailsImager::ImagesController < ApplicationController
     image_path = File.realpath(image_path)
     validate_path(image_path)
     
-    image = Magick::Image.read(image_path).first
-    image = rimger.img_from_params(:image => image, :params => image_params)
-    
-    response.headers["Expires"] = 2.hours.from_now.httpdate
-    response.headers["Last-Modified"] = File.mtime(image_path).httpdate
-    
-    send_data image.to_blob, :type => "image/png", :disposition => "inline"
+    rimger.handle(
+      :controller => self,
+      :fpath => image_path,
+      :params => image_params
+    )
   end
   
 private

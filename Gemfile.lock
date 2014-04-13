@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_imager (0.0.1)
+    rails_imager (0.0.12)
       rails (~> 4.0.4)
 
 GEM
@@ -38,7 +38,7 @@ GEM
     hike (1.2.3)
     http2 (0.0.23)
     i18n (0.6.9)
-    knjrbfw (0.0.108)
+    knjrbfw (0.0.109)
       datet
       http2
       php4r
@@ -90,7 +90,7 @@ GEM
     string-cases (0.0.0)
     string-strtr (0.0.3)
     thor (0.19.1)
-    thread_safe (0.3.2)
+    thread_safe (0.3.3)
     tilt (1.4.1)
     treetop (1.4.15)
       polyglot
@@ -104,7 +104,7 @@ PLATFORMS
 
 DEPENDENCIES
   datet
-  knjrbfw
+  knjrbfw (>= 0.0.109)
   rails_imager!
   rmagick
   sqlite3

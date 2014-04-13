@@ -1,13 +1,14 @@
 require "RMagick"
 require "knjrbfw"
 require "tmpdir"
+require "datet"
 
 class RailsImager::ImageHandler
-  PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color]
+  PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color, :force]
   
   #This is the default cache which is plased in the temp-directory, so it will be cleared on every restart. It should always exist.
   DEFAULT_CACHE_DIR = "#{Dir.tmpdir}/rails-imager-cache"
-  Dir.mkdir(DEFAULT_CACHE_DIR) if !Dir.exists?(DEFAULT_CACHE_DIR)
+  Dir.mkdir(DEFAULT_CACHE_DIR) unless Dir.exists?(DEFAULT_CACHE_DIR)
   
   #Default arguments unless something else is given in constructor.
   DEFAULT_ARGS = {
@@ -92,6 +93,7 @@ class RailsImager::ImageHandler
     
     if params[:rounded_corners]
       img = img.clone
+      img.format = "png" # Needs PNG format for transparency.
       args = {:img => img, :radius => params[:rounded_corners].to_i}
       
       if params[:border] && params[:border_color]
@@ -134,7 +136,7 @@ class RailsImager::ImageHandler
   end
   
   FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS = [:fpath, :image, :request, :params]
-  #Checks if a cache-file is created for the given filepath or image. If not then it will be created. If the cache-object is too old, then it will updated. Then returns the path to the cache-object in the end.
+  # Checks if a cache-file is created for the given filepath or image. If not then it will be created. If the cache-object is too old, then it will updated. Then returns the path to the cache-object in the end.
   def force_cache_from_request(args)
     args.each do |key, val|
       raise "Invalid argument: '#{key}'." if !FORCE_CACHE_FROM_PARAMS_ALLOWED_ARGS.include?(key)
@@ -169,7 +171,8 @@ class RailsImager::ImageHandler
     end
     
     if should_generate
-      img = Magick::Image.read(fpath).first unless img
+      img = ::Magick::Image.read(fpath).first unless img
+      img.format = "png"
       img = self.img_from_params(:image => img, :params => params)
       img.write(cachepath)
     else
@@ -187,7 +190,7 @@ class RailsImager::ImageHandler
       :cachepath => cachepath,
       :generated => should_generate,
       :not_modified => not_modified,
-      :mod_time => mod_time
+      :mod_time => mod_time,
     }
   end
   
@@ -195,14 +198,14 @@ class RailsImager::ImageHandler
   #Automatically handles the image with generation, cache control and more.
   def handle(args)
     args.each do |key, val|
-      raise "Invalid argument: '#{key}'." if !HANDLE_ALLOWED_ARGS.include?(key)
+      raise "Invalid argument: '#{key}'." unless HANDLE_ALLOWED_ARGS.include?(key)
     end
     
     controller = args[:controller]
-    raise "No controller was given." if !controller
+    raise "No controller was given." unless controller
     request = controller.request
     params = args[:params]
-    raise "No params was given." if !params
+    raise "No params was given." unless params
     
     if args[:image]
       fpath = args[:image].filename
@@ -211,14 +214,26 @@ class RailsImager::ImageHandler
     end
     
     raise "No filepath was given." if !fpath
-    res = self.force_cache_from_request(fpath: fpath, request: request, params: params)
+    res = self.force_cache_from_request(:fpath => fpath, :request => request, :params => params)
     
-    if res[:not_modified]
+    if params[:force] && params[:force] != "0"
+      force = true
+    else
+      force = false
+    end
+    
+    controller.response.headers["Last-Modified"] = res[:mod_time].httpdate
+    
+    if force
+      controller.response.headers["Expires"] = Time.now.httpdate
+    else
+      controller.response.headers["Expires"] = 2.hours.from_now.httpdate
+    end
+    
+    if res[:not_modified] && !force
       controller.render :nothing => true, :status => "304 Not Modified"
     else
-      controller.expires_in 1.weeks, public: true
-      controller.response.header["Last-Modified"] = res[:mod_time].to_s
-      controller.send_file res[:cachepath], type: "image/png", disposition: "inline", filename: "picture.png"
+      controller.send_file res[:cachepath], :type => "image/png", :disposition => "inline", :filename => "picture.png"
     end
   end
   
@@ -227,7 +242,7 @@ class RailsImager::ImageHandler
     Dir.foreach(@args[:cache_dir]) do |file|
       next if file == "." || file == ".."
       fn = "#{@args[:cache_dir]}/#{file}"
-      next if !File.file?(fn)
+      next unless File.file?(fn)
       
       if blk == nil
         res = true

@@ -8,7 +8,7 @@ class RailsImager::ImageHandlerTest < ActiveSupport::TestCase
   TEST_FILE = File.realpath("#{File.dirname(__FILE__)}/test.png")
   IMG = Magick::Image.read(TEST_FILE).first
   CACHE_DIR = "#{Dir.tmpdir}/rails-imager-test-cache"
-  CACHE_PATH_SMARTSIZE_350 = "#{CACHE_DIR}/#{Knj::Strings.sanitize_filename(IMG.filename)}__ARGS___width-_height-_smartsize-350_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
+  CACHE_PATH_SMARTSIZE_350 = "#{CACHE_DIR}/#{Knj::Strings.sanitize_filename(IMG.filename)}__ARGS___width-_height-_smartsize-350_maxwidth-_maxheight-_rounded_corners-_border-_border_color-_force-"
   FileUtils.rm_r(CACHE_DIR) if Dir.exists?(CACHE_DIR)
   Dir.mkdir(CACHE_DIR)
   RIMG = RailsImager::ImageHandler.new(:cache_dir => CACHE_DIR)
@@ -77,7 +77,7 @@ class RailsImager::ImageHandlerTest < ActiveSupport::TestCase
   
   test "should be able to generate valid cache names" do
     cachename = RIMG.cachename_from_params(:fpath => '1\\2 3', :params => {:smartsize => 400})
-    assert_equal cachename, "1_2_3__ARGS___width-_height-_smartsize-400_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
+    assert_equal cachename, "1_2_3__ARGS___width-_height-_smartsize-400_maxwidth-_maxheight-_rounded_corners-_border-_border_color-_force-"
   end
   
   test "should be able to generate cache" do

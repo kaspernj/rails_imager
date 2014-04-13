@@ -5,7 +5,7 @@ source "https://rubygems.org"
 # development dependencies will be added by default to the :development group.
 gemspec
 
-gem "knjrbfw"
+gem "knjrbfw", ">= 0.0.109"
 gem "rmagick"
 gem "datet"
 gem "string-cases"
@@ -17,7 +17,3 @@ gem "string-cases"
 
 # To use debugger
 # gem 'debugger'
-
-group :test do
-  gem "sqlite3"
-end
