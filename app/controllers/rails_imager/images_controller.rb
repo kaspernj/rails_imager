@@ -10,7 +10,9 @@ class RailsImager::ImagesController < ApplicationController
       raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImageHandler::PARAMS_ARGS.map{ |param| param.to_s }.include?(key)
     end
     
-    image_path = "#{Rails.public_path}/#{params[:id]}"
+    image_id = params[:id].to_s.gsub("%C3%B8", "ø")
+    
+    image_path = "#{Rails.public_path}/#{image_id}"
     image_path = File.realpath(image_path)
     validate_path(image_path)
     
