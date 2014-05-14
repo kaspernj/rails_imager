@@ -38,22 +38,25 @@ module RailsImager::ImagesHelper
     
     
     newpath << "/rails_imager/images/"
-    newpath << URI.encode(path)
-    newpath << "/?"
+    newpath << path
     
-    first = true
-    args.each do |key, val|
-      if first
-        first = false
-      else
-        newpath << "&"
+    if args && args.any?
+      newpath << "?"
+      
+      first = true
+      args.each do |key, val|
+        if first
+          first = false
+        else
+          newpath << "&"
+        end
+        
+        realkey = "image[#{key}]"
+        
+        newpath << URI.encode(realkey.to_s)
+        newpath << "="
+        newpath << URI.encode(val.to_s)
       end
-      
-      realkey = "image[#{key}]"
-      
-      newpath << URI.encode(realkey.to_s)
-      newpath << "="
-      newpath << URI.encode(val.to_s)
     end
     
     return newpath
