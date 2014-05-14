@@ -20,9 +20,28 @@ YourApp::Application.routes.draw do
 end
 ```
 
+Add this to the `ApplicationHelper` in order to gain access to the `rails_imager_p`-helper method for generating URL's easy.
+```ruby
+module ApplicationHelper
+  include RailsImager::ImagesHelper
+end
+```
+
 ## Usage
 
 Now you can use RailsImager to convert any image located in the public-folder like so:
+
+### rails_imager_p helper method
+
+Usage with a static image in the public folder:
+```ruby
+<%= image_tag rails_imager_p("/picture.jpg", :smartsize => 200, :rounded_corners => 10, :border => 1, :border_color => "black") %>
+```
+
+Usage with a Paperclip attachment on a model:
+```ruby
+<%= image_tag rails_imager_p(user.picture, :smartsize => 200) %>
+```
 
 ### Rounded corners
 
