@@ -9,12 +9,35 @@ module RailsImager::ImagesHelper
       path = path_without_public
     end
     
+    newpath = ""
+    
+    if args[:url]
+      args.delete(:url)
+      newpath << "#{request.protocol}#{request.host_with_port}"
+    elsif args[:mailer]
+      args.delete(:mailer)
+      
+      if ActionMailer::Base.default_url_options[:protocol]
+        newpath << ActionMailer::Base.default_url_options[:protocol]
+      else
+        newpath << "http://"
+      end
+      
+      newpath << ActionMailer::Base.default_url_options[:host]
+      
+      if ActionMailer::Base.default_url_options[:port]
+        newpath << ":#{ActionMailer::Base.default_url_options[:port]}"
+      end
+    end
+    
     # Check for invalid parameters.
     args.each do |key, val|
       raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImageHandler::PARAMS_ARGS.include?(key)
     end
     
-    newpath = "/rails_imager/images/"
+    
+    
+    newpath << "/rails_imager/images/"
     newpath << URI.encode(path)
     newpath << "/?"
     
