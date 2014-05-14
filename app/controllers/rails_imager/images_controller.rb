@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_dependency "rails_imager/application_controller"
 
 class RailsImager::ImagesController < ApplicationController
