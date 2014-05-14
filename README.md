@@ -12,7 +12,7 @@ gem 'rails_imager'
 
 The mount RailsImager in your "routes.rb":
 
-```
+```ruby
 YourApp::Application.routes.draw do
   ...
   mount RailsImager::Engine => "/rails_imager"
