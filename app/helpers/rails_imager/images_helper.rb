@@ -3,7 +3,7 @@ require "uri"
 module RailsImager::ImagesHelper
   def rails_imager_p(path, args = {})
     if path.class.name == "Paperclip::Attachment"
-      raise "Paperclip path does not start with public path." unless path.path.to_s.start_with?(Rails.public_path.to_s)
+      raise "Paperclip path does not start with public path: #{path.path}" unless path.path.to_s.start_with?(Rails.public_path.to_s)
       path_without_public = path.path.to_s.gsub("#{Rails.public_path}/", "")
       raise "Path didn't change '#{path.path}' - '#{path_without_public}'." if path.path.to_s == path_without_public
       path = path_without_public
