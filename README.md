@@ -84,5 +84,15 @@ Give the image a border of a certain size and/or with a certain color.
 http://localhost:3000/rails_imager/images/filename.png?border=2&border_color=black
 ```
 
+
+## Caching
+
+RailsImager performs various forms of caching, to avoid having to do too much work in regards to the actual resizing.
+
+It caches the results as temp-files, so it never has to render the same image with the same parameters again.
+
+It sends out the appropriate headers to the client, so the client doesn't read the same image again and again.
+
+
 ## License
 This project uses MIT-LICENSE.
