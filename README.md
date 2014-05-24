@@ -34,12 +34,12 @@ Now you can use RailsImager to convert any image located in the public-folder li
 ### rails_imager_p helper method
 
 Usage with a static image in the public folder:
-```ruby
+```erb
 <%= image_tag rails_imager_p("/picture.jpg", :smartsize => 200, :rounded_corners => 10, :border => 1, :border_color => "black") %>
 ```
 
 Usage with a Paperclip attachment on a model:
-```ruby
+```erb
 <%= image_tag rails_imager_p(user.picture, :smartsize => 200) %>
 ```
 
