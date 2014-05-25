@@ -34,12 +34,12 @@ Now you can use RailsImager to convert any image located in the public-folder li
 ### rails_imager_p helper method
 
 Usage with a static image in the public folder:
-```ruby
+```erb
 <%= image_tag rails_imager_p("/picture.jpg", :smartsize => 200, :rounded_corners => 10, :border => 1, :border_color => "black") %>
 ```
 
 Usage with a Paperclip attachment on a model:
-```ruby
+```erb
 <%= image_tag rails_imager_p(user.picture, :smartsize => 200) %>
 ```
 
@@ -83,6 +83,16 @@ Give the image a border of a certain size and/or with a certain color.
 ```
 http://localhost:3000/rails_imager/images/filename.png?border=2&border_color=black
 ```
+
+
+## Caching
+
+RailsImager performs various forms of caching, to avoid having to do too much work in regards to the actual resizing.
+
+It caches the results as temp-files, so it never has to render the same image with the same parameters again.
+
+It sends out the appropriate headers to the client, so the client doesn't read the same image again and again.
+
 
 ## License
 This project uses MIT-LICENSE.
