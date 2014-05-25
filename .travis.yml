@@ -12,3 +12,5 @@ notifications:
 
 cache:
   - bundler
+
+script: "bundle exec rspec --format progress"
