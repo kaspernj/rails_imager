@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kaspernj/rails_imager.svg?branch=master)](https://travis-ci.org/kaspernj/rails_imager)
+
 # RailsImager
 
 Generate images on the fly with caching by giving simple parameters to URL's.
