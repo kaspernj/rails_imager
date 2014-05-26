@@ -1,3 +1,4 @@
+[![Code Climate](https://codeclimate.com/github/kaspernj/rails_imager.png)](https://codeclimate.com/github/kaspernj/rails_imager)
 [![Build Status](https://travis-ci.org/kaspernj/rails_imager.svg?branch=master)](https://travis-ci.org/kaspernj/rails_imager)
 
 # RailsImager
