@@ -131,34 +131,28 @@ private
     @width = @image_params[:width].to_i if @image_params[:width].to_i > 0
     @height = @image_params[:height].to_i if @image_params[:height].to_i > 0
     
-    validate_and_set_smartsize
+    validate_and_set_smartsize if @image_params[:smartsize]
     validate_and_set_max_width
     validate_and_set_max_height
-    calculate_missing_width
-    calculate_missing_height
+    calculate_missing_width if @image_params[:height] && !@image_params[:width]
+    calculate_missing_height if @image_params[:width] && !@image_params[:height]
   end
   
   def calculate_missing_height
-    if @image_params[:width] && !@image_params[:height]
-      @height = (@image_height.to_f / (@image_width.to_f / @width.to_f)).to_i
-    end
+    @height = (@image_height.to_f / (@image_width.to_f / @width.to_f)).to_i
   end
   
   def calculate_missing_width
-    if @image_params[:height] && !@image_params[:width]
-      @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
-    end
+    @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
   end
   
   def validate_and_set_smartsize
-    if @image_params[:smartsize]
-      if @image_width > @image_height
-        @width = @image_params[:smartsize].to_i
-        @height = (@image_height.to_f / (@image_width.to_f / @width.to_f)).to_i
-      else
-        @height = @image_params[:smartsize].to_i
-        @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
-      end
+    if @image_width > @image_height
+      @width = @image_params[:smartsize].to_i
+      calculate_missing_height
+    else
+      @height = @image_params[:smartsize].to_i
+      calculate_missing_width
     end
   end
   
@@ -167,8 +161,8 @@ private
       maxwidth = @image_params[:maxwidth].to_i
       
       if @width > maxwidth
-        @height = (@image_height.to_f / (@image_width.to_f / maxwidth.to_f)).to_i
         @width = maxwidth
+        calculate_missing_height
       end
     end
   end
@@ -178,8 +172,8 @@ private
       maxheight = @image_params[:maxheight].to_i
       
       if @height > maxheight
-        @width = (@image_width.to_f / (@image_height.to_f / maxheight.to_f)).to_i
         @height = maxheight
+        calculate_missing_width
       end
     end
   end
