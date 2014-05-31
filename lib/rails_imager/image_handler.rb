@@ -43,65 +43,15 @@ class RailsImager::ImageHandler
     img_width = img.columns
     img_height = img.rows
     
-    width = img_width
-    height = img_height
-    
-    width = params[:width].to_i if params[:width].to_i > 0
-    height = params[:height].to_i if params[:height].to_i > 0
-    
-    #Check arguments and manipulate image.
-    if params[:smartsize]
-      if img_width > img_height
-        width = params[:smartsize].to_i
-        height = (img_height.to_f / (img_width.to_f / width.to_f)).to_i
-      else
-        height = params[:smartsize].to_i
-        width = (img_width.to_f / (img_height.to_f / height.to_f)).to_i
-      end
-    end
-    
-    if params[:maxwidth]
-      maxwidth = params[:maxwidth].to_i
-      
-      if width > maxwidth
-        height = (img_height.to_f / (img_width.to_f / maxwidth.to_f)).to_i
-        width = maxwidth
-      end
-    end
-    
-    if params[:maxheight]
-      maxheight = params[:maxheight].to_i
-      
-      if height > maxheight
-        width = (img_width.to_f / (img_height.to_f / maxheight.to_f)).to_i
-        height = maxheight
-      end
-    end
-    
-    if params[:width] && !params[:height]
-      height = (img_height.to_f / (img_width.to_f / width.to_f)).to_i
-    elsif params[:height] && !params[:width]
-      width = (img_width.to_f / (img_height.to_f / height.to_f)).to_i
-    elsif params[:width] && params[:height]
-      width = params[:width].to_i
-      height = params[:height].to_i
-    end
+    sizes = calcuate_sizes(img_width, img_height, params)
+    width, height = sizes[:width], sizes[:height]
     
     if width != img_width || height != img_height
       img = img.resize(width, height)
     end
     
     if params[:rounded_corners]
-      img = img.clone
-      img.format = "png" # Needs PNG format for transparency.
-      args = {:img => img, :radius => params[:rounded_corners].to_i}
-      
-      if params[:border] && params[:border_color]
-        args[:border] = params[:border].to_i
-        args[:border_color] = params[:border_color]
-      end
-      
-      Knj::Image.rounded_corners(args)
+      img = image_with_rounded_corners(img, params)
     end
     
     return img
@@ -128,8 +78,8 @@ class RailsImager::ImageHandler
     name << "__ARGS__"
     
     PARAMS_ARGS.each do |val|
-      name += "_" unless name.empty?
-      name += "#{val}-#{params[val]}"
+      name << "_" unless name.empty?
+      name << "#{val}-#{params[val]}"
     end
     
     return name
@@ -252,5 +202,67 @@ class RailsImager::ImageHandler
       
       File.unlink(fn) if res == true
     end
+  end
+  
+private
+  
+  def calcuate_sizes(img_width, img_height, params)
+    width = img_width
+    height = img_height
+    
+    width = params[:width].to_i if params[:width].to_i > 0
+    height = params[:height].to_i if params[:height].to_i > 0
+    
+    #Check arguments and manipulate image.
+    if params[:smartsize]
+      if img_width > img_height
+        width = params[:smartsize].to_i
+        height = (img_height.to_f / (img_width.to_f / width.to_f)).to_i
+      else
+        height = params[:smartsize].to_i
+        width = (img_width.to_f / (img_height.to_f / height.to_f)).to_i
+      end
+    end
+    
+    if params[:maxwidth]
+      maxwidth = params[:maxwidth].to_i
+      
+      if width > maxwidth
+        height = (img_height.to_f / (img_width.to_f / maxwidth.to_f)).to_i
+        width = maxwidth
+      end
+    end
+    
+    if params[:maxheight]
+      maxheight = params[:maxheight].to_i
+      
+      if height > maxheight
+        width = (img_width.to_f / (img_height.to_f / maxheight.to_f)).to_i
+        height = maxheight
+      end
+    end
+    
+    if params[:width] && !params[:height]
+      height = (img_height.to_f / (img_width.to_f / width.to_f)).to_i
+    elsif params[:height] && !params[:width]
+      width = (img_width.to_f / (img_height.to_f / height.to_f)).to_i
+    end
+    
+    return {:width => width, :height => height}
+  end
+  
+  def image_with_rounded_corners(img, params)
+    img = img.clone
+    img.format = "png" # Needs PNG format for transparency.
+    args = {:img => img, :radius => params[:rounded_corners].to_i}
+    
+    if params[:border] && params[:border_color]
+      args[:border] = params[:border].to_i
+      args[:border_color] = params[:border_color]
+    end
+    
+    Knj::Image.rounded_corners(args)
+    
+    return img
   end
 end

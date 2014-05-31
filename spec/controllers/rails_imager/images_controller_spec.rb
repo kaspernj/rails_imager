@@ -14,13 +14,13 @@ describe RailsImager::ImagesController do
   it "cache via expires" do
     get :show, :use_route => :rails_imager, :id => "test.png", :image => {:smartsize => 200, :rounded_corners => 8}
     image_path = "#{Rails.public_path}/test.png"
-    assert_not_nil response.headers["Expires"], "Didn't find expires header in response."
+    response.headers["Expires"].should_not eq nil
     assert_equal response.headers["Last-Modified"], File.mtime(image_path).httpdate
   end
   
   it "invalid parameters" do
-    assert_raise ArgumentError do
+    expect {
       get :show, :use_route => :rails_imager, :id => "test.png", :image => {:invalid_param => "kasper"}
-    end
+    }.to raise_error(ArgumentError)
   end
 end
