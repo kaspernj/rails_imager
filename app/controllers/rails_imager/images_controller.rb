@@ -2,14 +2,8 @@ class RailsImager::ImagesController < ApplicationController
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color, :force]
   
   def show
-    @image_params = params[:image] || {}
-    @image_params.each do |key, val|
-      raise ArgumentError, "Invalid parameter: '#{key}'." unless PARAMS_ARGS.map{ |param| param.to_s }.include?(key)
-    end
-    
-    @path = "#{Rails.public_path}/#{params[:id]}"
-    @full_path = File.realpath(@path)
-    validate_path
+    set_and_validate_parameters
+    set_path
     @mod_time = File.mtime(@full_path)
     generate_cache_name
     generate_cache if should_generate_cache?
@@ -23,6 +17,19 @@ class RailsImager::ImagesController < ApplicationController
   end
   
 private
+  
+  def set_path
+    @path = "#{Rails.public_path}/#{params[:id]}"
+    @full_path = File.realpath(@path)
+    validate_path
+  end
+  
+  def set_and_validate_parameters
+    @image_params = params[:image] || {}
+    @image_params.each do |key, val|
+      raise ArgumentError, "Invalid parameter: '#{key}'." unless PARAMS_ARGS.map{ |param| param.to_s }.include?(key)
+    end
+  end
   
   def force?
     if @image_params[:force] && @image_params[:force].to_s == "true"
@@ -124,7 +131,26 @@ private
     @width = @image_params[:width].to_i if @image_params[:width].to_i > 0
     @height = @image_params[:height].to_i if @image_params[:height].to_i > 0
     
-    # Check arguments and manipulate image.
+    validate_and_set_smartsize
+    validate_and_set_max_width
+    validate_and_set_max_height
+    calculate_missing_width
+    calculate_missing_height
+  end
+  
+  def calculate_missing_height
+    if @image_params[:width] && !@image_params[:height]
+      @height = (@image_height.to_f / (@image_width.to_f / @width.to_f)).to_i
+    end
+  end
+  
+  def calculate_missing_width
+    if @image_params[:height] && !@image_params[:width]
+      @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
+    end
+  end
+  
+  def validate_and_set_smartsize
     if @image_params[:smartsize]
       if @image_width > @image_height
         @width = @image_params[:smartsize].to_i
@@ -134,7 +160,9 @@ private
         @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
       end
     end
-    
+  end
+  
+  def validate_and_set_max_width
     if @image_params[:maxwidth]
       maxwidth = @image_params[:maxwidth].to_i
       
@@ -143,7 +171,9 @@ private
         @width = maxwidth
       end
     end
-    
+  end
+  
+  def validate_and_set_max_height
     if @image_params[:maxheight]
       maxheight = @image_params[:maxheight].to_i
       
@@ -151,12 +181,6 @@ private
         @width = (@image_width.to_f / (@image_height.to_f / maxheight.to_f)).to_i
         @height = maxheight
       end
-    end
-    
-    if @image_params[:width] && !@image_params[:height]
-      @height = (@image_height.to_f / (@image_width.to_f / @width.to_f)).to_i
-    elsif @image_params[:height] && !@image_params[:width]
-      @width = (@image_width.to_f / (@image_height.to_f / @height.to_f)).to_i
     end
   end
   
