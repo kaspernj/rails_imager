@@ -112,6 +112,8 @@ private
   def apply_image_changes
     @image_width = @image.columns
     @image_height = @image.rows
+    @width = @image_width
+    @height = @image_height
     
     calcuate_sizes
     
@@ -125,9 +127,6 @@ private
   end
   
   def calcuate_sizes
-    @width = @image_width
-    @height = @image_height
-    
     @width = @image_params[:width].to_i if @image_params[:width].to_i > 0
     @height = @image_params[:height].to_i if @image_params[:height].to_i > 0
     
@@ -188,6 +187,6 @@ private
       args[:border_color] = @image_params[:border_color]
     end
     
-    Knj::Image.rounded_corners(args)
+    ::Knj::Image.rounded_corners(args)
   end
 end
