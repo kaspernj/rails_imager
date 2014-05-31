@@ -67,7 +67,7 @@ private
   def check_arguments(args)
     # Check for invalid parameters.
     args.each do |key, val|
-      raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImageHandler::PARAMS_ARGS.include?(key)
+      raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImagesController::PARAMS_ARGS.include?(key)
     end
   end
   
