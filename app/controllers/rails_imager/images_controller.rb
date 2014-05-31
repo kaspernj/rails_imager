@@ -112,24 +112,25 @@ private
   def apply_image_changes
     @image_width = @image.columns
     @image_height = @image.rows
-    @width = @image_width
-    @height = @image_height
+    
+    if @image_params[:width].to_i > 0
+      @width = @image_params[:width].to_i
+    else
+      @width = @image_width
+    end
+    
+    if @image_params[:height].to_i > 0
+      @height = @image_params[:height].to_i
+    else
+      @height = @image_height
+    end
     
     calcuate_sizes
-    
-    if @width != @image_width || @height != @image_height
-      @image = @image.resize(@width, @height)
-    end
-    
-    if @image_params[:rounded_corners]
-      apply_rounded_corners
-    end
+    @image = @image.resize(@width, @height) if @width != @image_width || @height != @image_height
+    apply_rounded_corners if @image_params[:rounded_corners]
   end
   
   def calcuate_sizes
-    @width = @image_params[:width].to_i if @image_params[:width].to_i > 0
-    @height = @image_params[:height].to_i if @image_params[:height].to_i > 0
-    
     validate_and_set_smartsize if @image_params[:smartsize]
     validate_and_set_max_width
     validate_and_set_max_height
