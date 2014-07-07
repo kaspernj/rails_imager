@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_imager (0.0.18)
+    rails_imager (0.0.19)
       datet
       knjrbfw (>= 0.0.109)
       rails (>= 4.0.0)
