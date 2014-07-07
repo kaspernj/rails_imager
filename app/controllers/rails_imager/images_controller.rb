@@ -65,7 +65,7 @@ private
   
   def validate_path
     raise "No such file: '#{@full_path}'." unless File.exists?(@full_path)
-    raise "Image wasn't in the public folder: '#{@full_path}'." unless @full_path.start_with?(Rails.public_path.to_s)
+    raise "Image wasn't in the public folder: '#{@full_path}'." unless @full_path.start_with?(File.realpath(Rails.public_path.to_s))
   end
   
   def generate_cache_name
