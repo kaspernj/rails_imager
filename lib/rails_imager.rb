@@ -13,12 +13,12 @@ module RailsImager
     else
       path = "#{File.dirname(__FILE__)}/rails_imager/#{::StringCases.camel_to_snake(name)}.rb"
     end
-    
+
     if File.exists?(path)
       require path
       return const_get(name) if const_defined?(name)
     end
-    
+
     super
   end
 end

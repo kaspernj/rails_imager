@@ -3,7 +3,7 @@ require "uri"
 module RailsImager::ImagesHelper
   def rails_imager_p(path, args = {})
     path = path_from_arg(path)
-    
+
     if args.delete(:url)
       newpath = "#{request.protocol}#{request.host_with_port}"
     elsif args.delete(:mailer)
@@ -11,41 +11,41 @@ module RailsImager::ImagesHelper
     else
       newpath = ""
     end
-    
+
     check_arguments(args)
-    
+
     newpath << "/rails_imager/images/"
     newpath << path
-    
+
     if args && args.any?
       newpath << "?"
       newpath << url_encoded_arguments(args)
     end
-    
+
     return newpath
   end
-  
+
 private
-  
+
   def mailer_pre_path
     if ActionMailer::Base.default_url_options[:protocol]
       pre_path = ActionMailer::Base.default_url_options[:protocol]
     else
       pre_path = "http://"
     end
-    
+
     pre_path << ActionMailer::Base.default_url_options[:host]
-    
+
     if ActionMailer::Base.default_url_options[:port]
       pre_path << ":#{ActionMailer::Base.default_url_options[:port]}"
     end
-    
+
     return pre_path
   end
-  
+
   def url_encoded_arguments(args)
     path = ""
-    
+
     first = true
     args.each do |key, val|
       if first
@@ -53,24 +53,24 @@ private
       else
         path << "&"
       end
-      
+
       realkey = "image[#{key}]"
-      
+
       path << URI.encode(realkey)
       path << "="
       path << URI.encode(val.to_s)
     end
-    
+
     return path
   end
-  
+
   def check_arguments(args)
     # Check for invalid parameters.
     args.each do |key, val|
       raise ArgumentError, "Invalid parameter: '#{key}'." unless RailsImager::ImagesController::PARAMS_ARGS.include?(key)
     end
   end
-  
+
   def path_from_arg(path)
     if path.class.name == "Paperclip::Attachment"
       raise "Paperclip path does not start with public path: #{path.path}" unless path.path.to_s.start_with?(Rails.public_path.to_s)
