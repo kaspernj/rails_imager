@@ -64,8 +64,17 @@ private
   end
 
   def validate_path
-    raise "No such file: '#{@full_path}'." unless File.exists?(@full_path)
-    raise "Image wasn't in the public folder: '#{@full_path}'." unless @full_path.start_with?(File.realpath(Rails.public_path.to_s))
+    allowed_paths = RailsImager.config.allowed_paths
+
+    allowed = false
+    allowed_paths.each do |allowed_path|
+      if @full_path.start_with?(allowed_path)
+        allowed = true
+        break
+      end
+    end
+
+    raise ArgumentError, "Image wasn't in an allowed path: '#{@full_path}'." unless allowed
   end
 
   def generate_cache_name

@@ -3,6 +3,7 @@ require "rails_imager/engine"
 require "string-cases"
 require "datet"
 require "knjrbfw"
+require "RMagick" unless ::Kernel.const_defined?(:RMagick)
 
 module RailsImager
   def self.const_missing(name)
@@ -20,5 +21,14 @@ module RailsImager
     end
 
     super
+  end
+
+  @config = RailsImager::Config.new
+  def self.config
+    if block_given?
+      yield @config
+    else
+      return @config
+    end
   end
 end
