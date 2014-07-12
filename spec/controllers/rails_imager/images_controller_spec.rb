@@ -2,6 +2,12 @@ require 'spec_helper'
 require 'RMagick'
 
 describe RailsImager::ImagesController do
+  before do
+    RailsImager.config do |config|
+      config.allowed_paths << File.realpath("#{File.dirname(__FILE__)}/../../dummy/public")
+    end
+  end
+
   it "smartsize" do
     get :show, :use_route => :rails_imager, :id => "test.png", :image => {:smartsize => 200}
     assert_response :success
@@ -10,82 +16,82 @@ describe RailsImager::ImagesController do
     img.columns.should eq 200
     img.rows.should eq 196
   end
-  
+
   it "cache via expires" do
     get :show, :use_route => :rails_imager, :id => "test.png", :image => {:smartsize => 200, :rounded_corners => 8}
     image_path = "#{Rails.public_path}/test.png"
     response.headers["Expires"].should_not eq nil
     assert_equal response.headers["Last-Modified"], File.mtime(image_path).httpdate
   end
-  
+
   it "should not accept invalid parameters" do
     expect {
       get :show, :use_route => :rails_imager, :id => "test.png", :image => {:invalid_param => "kasper"}
     }.to raise_error(ArgumentError)
   end
-  
+
   it "should do exact sizes" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:width => "640", :height => "480"}
     img = ::Magick::Image.from_blob(response.body).first
     img.columns.should eq 640
     img.rows.should eq 480
   end
-  
+
   it "should do rounded corners" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:smartsize => "640", :rounded_corners => "15", :border => "1", :border_color => "black"}
-    
+
     old_file_path = File.realpath("#{File.dirname(__FILE__)}/../../test.png")
     old_img = Magick::Image.read(old_file_path).first
-    
+
     img = ::Magick::Image.from_blob(response.body).first
     img.columns.should eq 640
     img.rows.should eq 629
-    
+
     #Test that corner pixels are transparent.
     4.times do |time|
       pixel = img.pixel_color(time, time)
       pixel.opacity.should eq 65535
-      
+
       pixel_orig = old_img.pixel_color(time, time)
       pixel_orig.opacity.should eq 0
     end
-    
+
     #Test that it got a black border.
     pixel = img.pixel_color(2, 5)
     pixel.red.should eq 0
     pixel.green.should eq 0
     pixel.blue.should eq 0
     pixel.opacity.should eq 0
-    
+
     #Test that middle pixels are not transparent.
     100.upto(200) do |time|
       pixel = img.pixel_color(time, time)
       pixel.opacity.should eq 0
-      
+
       pixel_orig = old_img.pixel_color(time, time)
       pixel_orig.opacity.should eq 0
     end
   end
-  
+
   it "should do max width" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:maxwidth => 200}
     img = ::Magick::Image.from_blob(response.body).first
     img.columns.should eq 200
     img.rows.should eq 196
   end
-  
+
   it "should do max height" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:maxheight => 200}
     img = ::Magick::Image.from_blob(response.body).first
     img.rows.should eq 200
     img.columns.should eq 203
   end
-  
+
   it "should be able to generate valid cache names" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:smartsize => 400}
     assigns(:cache_name).should include "test.png__ARGS__width-_height-_smartsize-400_maxwidth-_maxheight-_rounded_corners-_border-_border_color-"
   end
-  
+
   it "should be able to generate cache" do
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:smartsize => 400, :force => true}
     assigns(:image).should_not eq nil
@@ -94,14 +100,21 @@ describe RailsImager::ImagesController do
     response.code.should eq "200"
     assigns(:image).should eq nil
   end
-  
+
   it "should send not modified" do
     old_file_path = File.realpath("#{File.dirname(__FILE__)}/../../test.png")
-    
+
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:smartsize => 350}
     request.headers["If-Modified-Since"] = File.mtime(old_file_path)
     get :show, :use_route => "rails_imager", :id => "test.png", :image => {:smartsize => 350}
-    
+
     response.code.should eq "304"
+  end
+
+  it "should not allow paths that havent specifically been allowed" do
+    expect {
+      get :show, use_route: "rails_imager", id: "/../config.ru", image: {smartsize: 200}
+      puts "Body: #{response.body.to_s}"
+    }.to raise_error(ArgumentError)
   end
 end

@@ -3,6 +3,7 @@ require "rails_imager/engine"
 require "string-cases"
 require "datet"
 require "knjrbfw"
+require "RMagick" unless ::Kernel.const_defined?(:RMagick)
 
 module RailsImager
   def self.const_missing(name)
@@ -13,12 +14,21 @@ module RailsImager
     else
       path = "#{File.dirname(__FILE__)}/rails_imager/#{::StringCases.camel_to_snake(name)}.rb"
     end
-    
+
     if File.exists?(path)
       require path
       return const_get(name) if const_defined?(name)
     end
-    
+
     super
+  end
+
+  @config = RailsImager::Config.new
+  def self.config
+    if block_given?
+      yield @config
+    else
+      return @config
+    end
   end
 end
