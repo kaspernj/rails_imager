@@ -74,7 +74,7 @@ private
       end
     end
 
-    raise ArgumentError, "Image wasn't in an allowed path: '#{@full_path}'." unless allowed
+    raise ArgumentError, "Image wasn't in an allowed path: '#{@full_path}', allowed paths: #{allowed_paths}." unless allowed
   end
 
   def generate_cache_name

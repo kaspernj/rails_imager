@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_imager (0.0.19)
+    rails_imager (0.0.21)
       datet
       knjrbfw (>= 0.0.109)
       rails (>= 4.0.0)
@@ -52,7 +52,8 @@ GEM
       railties (>= 3.0.0)
     forgery (0.6.0)
     hike (1.2.3)
-    http2 (0.0.23)
+    http2 (0.0.26)
+      string-cases
     i18n (0.6.9)
     json (1.8.1)
     knjrbfw (0.0.110)
@@ -92,7 +93,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.3.2)
-    rmagick (2.13.2)
+    rmagick (2.13.3)
     rspec-core (2.14.8)
     rspec-expectations (2.14.5)
       diff-lcs (>= 1.1.3, < 2.0)
@@ -113,15 +114,15 @@ GEM
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
-    sprockets (2.12.1)
+    sprockets (2.12.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.1.3)
+    sprockets-rails (2.2.0)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
-      sprockets (~> 2.8)
+      sprockets (>= 2.8, < 4.0)
     sqlite3 (1.3.9)
     string-cases (0.0.0)
     string-strtr (0.0.3)
