@@ -23,8 +23,9 @@ module RailsImager
     super
   end
 
-  @config = RailsImager::Config.new
   def self.config
+    @config ||= RailsImager::Config.new
+
     if block_given?
       yield @config
     else
