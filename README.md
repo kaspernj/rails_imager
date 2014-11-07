@@ -31,6 +31,16 @@ module ApplicationHelper
 end
 ```
 
+## Capistrano
+
+If you use Capistrano to deploy, you probably symlink the "public/system" directory, in order to share uploaded images between releases. This screws with RailsImager's security only to serve images from the "public"-folder.
+
+You can solve this by adding the following initializer in "config/initializers/rails_imager.rb":
+```ruby
+# Add public/system to path, because it is symlinked through Capistrano on deployed servers.
+RailsImager.config.allowed_paths << File.realpath("#{Rails.public_path.to_s}/system")
+```
+
 ## Usage
 
 Now you can use RailsImager to convert any image located in the public-folder like so:
