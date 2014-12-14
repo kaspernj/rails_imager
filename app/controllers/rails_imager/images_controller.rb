@@ -1,3 +1,4 @@
+# encoding: utf-8
 class RailsImager::ImagesController < ApplicationController
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color, :force]
   URI_REPLACES = {
