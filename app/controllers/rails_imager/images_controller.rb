@@ -1,5 +1,11 @@
+# encoding: utf-8
 class RailsImager::ImagesController < ApplicationController
   PARAMS_ARGS = [:width, :height, :smartsize, :maxwidth, :maxheight, :rounded_corners, :border, :border_color, :force]
+  URI_REPLACES = {
+    "%C3%A6" => "æ",
+    "%C3%B8" => "ø",
+    "%C3%A5" => "å"
+  }
 
   def show
     set_and_validate_parameters
@@ -10,16 +16,21 @@ class RailsImager::ImagesController < ApplicationController
     set_headers
 
     if not_modified? && !force?
-      render :nothing => true, :status => "304 Not Modified"
+      render nothing: true, status: "304 Not Modified"
     else
-      send_file @cache_path, :type => "image/png", :disposition => "inline", :filename => "picture.png"
+      send_file @cache_path, type: "image/png", disposition: "inline", filename: "picture.png"
     end
   end
 
 private
 
   def set_path
-    @path = "#{Rails.public_path}/#{params[:id]}"
+    id = params[:id]
+    URI_REPLACES.each do |key, val|
+      id = id.gsub(key, val)
+    end
+
+    @path = "#{Rails.public_path}/#{id}"
     @full_path = File.realpath(@path)
     validate_path
   end
@@ -190,7 +201,7 @@ private
   def apply_rounded_corners
     @image = @image.clone
     @image.format = "png" # Needs PNG format for transparency.
-    args = {:img => @image, :radius => @image_params[:rounded_corners].to_i}
+    args = {img: @image, radius: @image_params[:rounded_corners].to_i}
 
     if @image_params[:border] && @image_params[:border_color]
       args[:border] = @image_params[:border].to_i
