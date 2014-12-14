@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = "Automatic resizing, bordering and more of images."
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
-  s.test_files = Dir["test/**/*"]
+  s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", ">= 4.0.0"
   s.add_dependency "knjrbfw", ">= 0.0.109"
@@ -26,4 +26,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "factory_girl_rails"
   s.add_development_dependency "forgery"
+  s.add_development_dependency "codeclimate-test-reporter"
 end
