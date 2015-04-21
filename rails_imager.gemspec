@@ -13,16 +13,22 @@ Gem::Specification.new do |s|
   s.summary     = "Automatic resizing, bordering and more of images."
   s.description = "Automatic resizing, bordering and more of images."
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", ">= 4.0.0"
   s.add_dependency "knjrbfw", ">= 0.0.109"
-  s.add_dependency "rmagick"
   s.add_dependency "datet"
   s.add_dependency "string-cases"
 
-  s.add_development_dependency "sqlite3"
+  if RUBY_ENGINE == "jruby"
+    s.add_dependency "rmagick4j"
+    s.add_development_dependency "activerecord-jdbcsqlite3-adapter"
+  else
+    s.add_dependency "rmagick"
+    s.add_development_dependency "sqlite3"
+  end
+
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "factory_girl_rails"
   s.add_development_dependency "forgery"
