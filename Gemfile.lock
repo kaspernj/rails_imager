@@ -2,11 +2,11 @@ PATH
   remote: .
   specs:
     rails_imager (0.0.23)
-      datet
-      knjrbfw (>= 0.0.109)
+      datet (~> 0.0.25)
+      knjrbfw (~> 0.0.112)
       rails (>= 4.0.0)
       rmagick4j
-      string-cases
+      string-cases (~> 0.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -46,6 +46,7 @@ GEM
     builder (3.2.2)
     codeclimate-test-reporter (0.3.0)
       simplecov (>= 0.7.1, < 1.0.0)
+    coderay (1.1.0)
     datet (0.0.25)
     diff-lcs (1.2.5)
     docile (1.1.3)
@@ -55,6 +56,7 @@ GEM
     factory_girl_rails (4.4.1)
       factory_girl (~> 4.4.0)
       railties (>= 3.0.0)
+    ffi (1.9.8-java)
     forgery (0.6.0)
     http2 (0.0.30)
       string-cases
@@ -62,7 +64,7 @@ GEM
     jdbc-sqlite3 (3.8.7)
     json (1.8.1)
     json (1.8.1-java)
-    knjrbfw (0.0.111)
+    knjrbfw (0.0.112)
       datet
       http2
       php4r
@@ -72,6 +74,7 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    method_source (0.8.2)
     mime-types (1.25.1)
     minitest (5.3.4)
     multi_json (1.10.1)
@@ -80,6 +83,15 @@ GEM
       http2
       string-strtr
     polyglot (0.3.5)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry (0.10.1-java)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+      spoon (~> 0.0)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -121,6 +133,9 @@ GEM
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    slop (3.6.0)
+    spoon (0.0.4)
+      ffi
     sprockets (3.0.1)
       rack (~> 1.0)
     sprockets-rails (2.2.4)
@@ -149,5 +164,6 @@ DEPENDENCIES
   codeclimate-test-reporter
   factory_girl_rails
   forgery
+  pry
   rails_imager!
   rspec-rails

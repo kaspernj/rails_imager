@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", ">= 4.0.0"
-  s.add_dependency "knjrbfw", ">= 0.0.109"
-  s.add_dependency "datet"
-  s.add_dependency "string-cases"
+  s.add_dependency "knjrbfw", "~> 0.0.112"
+  s.add_dependency "datet", "~> 0.0.25"
+  s.add_dependency "string-cases", "~> 0.0.1"
 
   if RUBY_ENGINE == "jruby"
     s.add_dependency "rmagick4j"
@@ -33,4 +33,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "factory_girl_rails"
   s.add_development_dependency "forgery"
   s.add_development_dependency "codeclimate-test-reporter"
+  s.add_development_dependency "pry"
 end
