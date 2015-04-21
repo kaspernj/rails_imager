@@ -25,8 +25,8 @@ Gem::Specification.new do |s|
     s.add_dependency "rmagick4j"
     s.add_development_dependency "activerecord-jdbcsqlite3-adapter"
   else
-    s.add_dependency "rmagick"
-    s.add_development_dependency "sqlite3"
+    s.add_dependency "rmagick", "~> 2.14.0"
+    s.add_development_dependency "sqlite3", "~> 1.3.10"
   end
 
   s.add_development_dependency "rspec-rails"
