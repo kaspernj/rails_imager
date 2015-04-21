@@ -22,10 +22,10 @@ Gem::Specification.new do |s|
   s.add_dependency "string-cases", "~> 0.0.1"
 
   if RUBY_ENGINE == "jruby"
-    s.add_dependency "rmagick4j"
+    s.add_development_dependency "rmagick4j"
     s.add_development_dependency "activerecord-jdbcsqlite3-adapter"
   else
-    s.add_dependency "rmagick", "~> 2.14.0"
+    s.add_development_dependency "rmagick", "~> 2.14.0"
     s.add_development_dependency "sqlite3", "~> 1.3.10"
   end
 

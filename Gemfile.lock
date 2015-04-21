@@ -1,11 +1,10 @@
 PATH
   remote: .
   specs:
-    rails_imager (0.0.24)
+    rails_imager (0.0.25)
       datet (~> 0.0.25)
       knjrbfw (~> 0.0.112)
       rails (>= 4.0.0)
-      rmagick (~> 2.14.0)
       string-cases (~> 0.0.1)
 
 GEM
@@ -185,5 +184,6 @@ DEPENDENCIES
   forgery
   pry
   rails_imager!
+  rmagick (~> 2.14.0)
   rspec-rails
   sqlite3 (~> 1.3.10)
