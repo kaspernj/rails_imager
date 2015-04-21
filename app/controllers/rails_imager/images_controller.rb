@@ -16,7 +16,7 @@ class RailsImager::ImagesController < ApplicationController
     set_headers
 
     if not_modified? && !force?
-      render nothing: true, status: "304 Not Modified"
+      render nothing: true, status: :not_modified
     else
       send_file @cache_path, type: "image/png", disposition: "inline", filename: "picture.png"
     end
@@ -97,20 +97,20 @@ private
       @cache_name << "_#{val}-#{@image_params[val]}"
     end
 
-    @cache_path = "#{cache_directory}/#{@cache_name}"
+    @cache_path = "#{cache_directory}/#{Digest::MD5.hexdigest(@cache_name)}.png"
   end
 
   def cache_directory
     require "tmpdir"
     cache_path = "#{Dir.tmpdir}/rails-imager-cache"
-    Dir.mkdir(cache_path) unless Dir.exists?(cache_path)
+    Dir.mkdir(cache_path) unless Dir.exist?(cache_path)
     return cache_path
   end
 
   def should_generate_cache?
     return true if force?
 
-    if File.exists?(@cache_path)
+    if File.exists?(@cache_path) && File.size(@cache_path) > 0
       if File.mtime(@cache_path) < File.mtime(@full_path)
         return true
       else
