@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'spec_helper'
-require 'rmagick'
+RailsImager.require_rmagick
 
 describe RailsImager::ImagesController do
   before do
