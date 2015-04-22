@@ -3,7 +3,7 @@ require "rails_imager/engine"
 require "string-cases"
 require "datet"
 require "knjrbfw"
-require "RMagick" unless ::Kernel.const_defined?(:RMagick)
+require "rmagick" unless ::Kernel.const_defined?(:RMagick)
 
 module RailsImager
   def self.const_missing(name)
