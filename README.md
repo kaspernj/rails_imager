@@ -31,6 +31,11 @@ module ApplicationHelper
 end
 ```
 
+In case you use RailsImager in an engine, you might want to alter the path through an initializer file (config/initializers/rails_imager.rb):
+```ruby
+RailsImager.config.path = "/my_engine/rails_imager"
+```
+
 ## Capistrano
 
 If you use Capistrano to deploy, you probably symlink the "public/system" directory, in order to share uploaded images between releases. This screws with RailsImager's security only to serve images from the "public"-folder.
