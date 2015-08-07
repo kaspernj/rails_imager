@@ -73,10 +73,15 @@ private
 
   def path_from_arg(path)
     if path.class.name == "Paperclip::Attachment"
-      raise "Paperclip path does not start with public path: #{path.path}" unless path.path.to_s.start_with?(Rails.public_path.to_s)
-      path_without_public = path.path.to_s.gsub("#{Rails.public_path}/", "")
-      raise "Path didn't change '#{path.path}' - '#{path_without_public}'." if path.path.to_s == path_without_public
-      return path_without_public
+      # Ignore check when running tests - its normal to store Paperclip::Attachment's elsewhere for easy cleanup
+      if Rails.env.test?
+        return path.path.to_s
+      else
+        raise "Paperclip path does not start with public path: #{path.path}" unless path.path.to_s.start_with?(Rails.public_path.to_s)
+        path_without_public = path.path.to_s.gsub("#{Rails.public_path}/", "")
+        raise "Path didn't change '#{path.path}' - '#{path_without_public}'." if path.path.to_s == path_without_public
+        return path_without_public
+      end
     elsif path.is_a?(String)
       return path
     else
