@@ -14,7 +14,7 @@ module RailsImager::ImagesHelper
 
     check_arguments(args)
 
-    newpath << "/rails_imager/images/"
+    newpath << "#{RailsImager.config.path}/images/"
     newpath << path
 
     if args && args.any?
