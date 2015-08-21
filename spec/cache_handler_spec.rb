@@ -9,6 +9,6 @@ describe RailsImager::CacheHandler do
       files << file
     end
 
-    expect(files).to eq ["#{RailsImager.cache_handler.path}/test.png"]
+    expect(files).to include "#{RailsImager.cache_handler.path}/test.png"
   end
 end
