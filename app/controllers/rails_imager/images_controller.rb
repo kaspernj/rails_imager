@@ -126,6 +126,7 @@ private
     @image.format = "png"
     apply_image_changes
     @image.write(@cache_path)
+    @image.destroy!
   end
 
   #Create a new image-object based on the given image-object and the parameters.
