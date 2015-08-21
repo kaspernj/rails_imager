@@ -101,10 +101,7 @@ private
   end
 
   def cache_directory
-    require "tmpdir"
-    cache_path = "#{Dir.tmpdir}/rails-imager-cache"
-    Dir.mkdir(cache_path) unless Dir.exist?(cache_path)
-    return cache_path
+    RailsImager.cache_handler.path
   end
 
   def should_generate_cache?

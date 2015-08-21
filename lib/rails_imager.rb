@@ -41,6 +41,10 @@ module RailsImager
       require "RMagick"
     end
   end
+
+  def self.cache_handler
+    @cache_handler ||= RailsImager::CacheHandler.new
+  end
 end
 
 RailsImager.require_rmagick
