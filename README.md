@@ -1,6 +1,6 @@
 [![Code Climate](https://codeclimate.com/github/kaspernj/rails_imager.png)](https://codeclimate.com/github/kaspernj/rails_imager)
 [![Test Coverage](https://codeclimate.com/github/kaspernj/rails_imager/coverage.png)](https://codeclimate.com/github/kaspernj/rails_imager)
-[![Build Status](https://api.shippable.com/projects/540e7b9d3479c5ea8f9ec23e/badge?branchName=master)](https://app.shippable.com/projects/540e7b9d3479c5ea8f9ec23e/builds/latest)
+[![Build Status](https://img.shields.io/shippable/540e7b9d3479c5ea8f9ec23e.svg)](https://app.shippable.com/projects/540e7b9d3479c5ea8f9ec23e/builds/latest)
 
 # RailsImager
 
